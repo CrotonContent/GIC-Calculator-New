@@ -1,0 +1,26 @@
+{
+  "posts": [
+    {
+      "slug": "are-gics-good-investment",
+      "title": "Are GICs a Good Investment? A Comprehensive Analysis",
+      "author": "daniel-schoester",
+      "date": "2025-01-22T12:00:00Z",
+      "thumbnail": "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+      "description": "A detailed analysis of whether Guaranteed Investment Certificates (GICs) are the right investment choice for you, comparing them with other investment options and examining their pros and cons.",
+      "category": "Investment Strategy",
+      "tags": ["GIC Analysis", "Investment Comparison", "Risk Management", "Fixed Income"],
+      "published": true
+    },
+    {
+      "slug": "understanding-gics-comprehensive-guide",
+      "title": "Understanding GICs: A Complete Guide to Guaranteed Investment Certificates",
+      "author": "daniel-schoester",
+      "date": "2024-03-22T12:00:00Z",
+      "thumbnail": "https://images.unsplash.com/photo-1553729459-efe14ef6055d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+      "description": "A comprehensive guide to Guaranteed Investment Certificates (GICs), covering everything from basic concepts to advanced investment strategies. Learn how GICs work, their benefits, and how to maximize your returns.",
+      "category": "Investment Education",
+      "tags": ["GIC safety", "GIC pros and cons", "GIC vs mutual funds", "Investment Strategy"],
+      "published": true
+    }
+  ]
+}

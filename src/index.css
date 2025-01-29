@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+/* Custom tooltip animations */
+@layer components {
+  [role="tooltip"] {
+    @apply transition-opacity duration-200;
+    animation: tooltip-slide-up 0.2s ease-out;
+  }
+}
+
+@keyframes tooltip-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

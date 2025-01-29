@@ -1,0 +1,49 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "authors"
+    label: "Authors"
+    folder: "content/authors"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Name", name: "name", widget: "string"}
+      - {label: "Avatar", name: "avatar", widget: "image"}
+      - {label: "Role", name: "role", widget: "string"}
+      - {label: "Bio", name: "bio", widget: "markdown"}
+      - {label: "Expertise", name: "expertise", widget: "list", field: {label: "Area", name: "area", widget: "string"}}
+      - {label: "Education", name: "education", widget: "list", fields: [
+          {label: "Degree", name: "degree", widget: "string"},
+          {label: "Institution", name: "institution", widget: "string"},
+          {label: "Year", name: "year", widget: "number"}
+        ]}
+      - {label: "Certifications", name: "certifications", widget: "list", fields: [
+          {label: "Name", name: "name", widget: "string"},
+          {label: "Organization", name: "organization", widget: "string"},
+          {label: "Year", name: "year", widget: "number"}
+        ]}
+      - {label: "Social Media", name: "social", widget: "object", fields: [
+          {label: "LinkedIn", name: "linkedin", widget: "string", required: false},
+          {label: "Twitter", name: "twitter", widget: "string", required: false}
+        ]}
+
+  - name: "blog"
+    label: "Blog"
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Author", name: "author", widget: "relation", collection: "authors", value_field: "{{slug}}", search_fields: ["name"]}
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      - {label: "Featured Image", name: "thumbnail", widget: "image", required: false}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Body", name: "body", widget: "markdown"}
+      - {label: "Category", name: "category", widget: "select", options: ["GIC Basics", "Investment Strategy", "Market Analysis", "Financial Planning"]}
+      - {label: "Tags", name: "tags", widget: "list"}
+      - {label: "Published", name: "published", widget: "boolean", default: false}
