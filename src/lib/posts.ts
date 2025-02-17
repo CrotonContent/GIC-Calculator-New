@@ -1,107 +1,113 @@
-import matter from 'gray-matter';
-import { remark } from 'remark';
-import html from 'remark-html';
-import remarkGfm from 'remark-gfm';
+import frontMatter from 'front-matter';
+import { marked } from 'marked';
 import type { Post, Author } from '../types/blog';
 
-export async function getAllPosts(): Promise<Post[]> {
+// Configure marked for better table rendering
+marked.setOptions({
+  gfm: true,
+  breaks: true
+});
+
+interface AuthorFrontMatterData {
+  name: string;
+  role: string;
+  avatar: string;
+  bio: string;
+  expertise: string[];
+  professional_experience: Array<{
+    role: string;
+    company: string;
+    period: string;
+  }>;
+  education: Array<{
+    degree: string;
+    institution: string;
+    year: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    organization: string;
+    year: string;
+  }>;
+  social: {
+    linkedin: string;
+    twitter?: string;
+  };
+}
+
+// Import author data
+import authorContent from '../../content/authors/daniel-schoester.md?raw';
+
+// Parse author data
+const authorData = frontMatter<AuthorFrontMatterData>(authorContent);
+const authors: Record<string, Author> = {
+  'daniel-schoester': {
+    slug: 'daniel-schoester',
+    name: authorData.attributes.name,
+    role: authorData.attributes.role,
+    avatar: authorData.attributes.avatar,
+    bio: authorData.attributes.bio,
+    expertise: authorData.attributes.expertise,
+    professional_experience: authorData.attributes.professional_experience,
+    education: authorData.attributes.education,
+    certifications: authorData.attributes.certifications,
+    social: authorData.attributes.social
+  }
+};
+
+export const getAuthor = (slug: string): Author => {
+  const author = authors[slug];
+  if (!author) {
+    throw new Error(`Author not found: ${slug}`);
+  }
+  return author;
+};
+
+interface FrontMatterData {
+  title: string;
+  excerpt: string;
+  description: string;
+  author: string;
+  date: string;
+  category: string;
+  tags: string[];
+  published: boolean;
+  lastUpdated?: string;
+  estimatedReadingTime?: number;
+}
+
+// Import the pre-processed blog post content
+import blogPostContent from '../../content/blog/are-gics-good-investment.md?raw';
+
+export const getPosts = async (): Promise<Post[]> => {
   try {
-    const response = await fetch('/content/blog/index.json');
-    if (!response.ok) {
-      throw new Error('Failed to fetch posts index');
-    }
-    const data = await response.json();
-    return data.posts.filter((post: Post) => post.published);
+    console.log('Parsing frontmatter...');
+    const { attributes, body } = frontMatter<FrontMatterData>(blogPostContent);
+    console.log('Parsed frontmatter:', attributes);
+
+    console.log('Converting markdown to HTML...');
+    const htmlContent = await Promise.resolve(marked(body));
+    console.log('HTML content length:', htmlContent.length);
+
+    const post: Post = {
+      slug: 'are-gics-good-investment',
+      title: attributes.title,
+      excerpt: attributes.excerpt,
+      description: attributes.description,
+      content: htmlContent,
+      author: getAuthor(attributes.author),
+      date: attributes.date,
+      category: attributes.category,
+      tags: attributes.tags,
+      published: attributes.published,
+      lastUpdated: attributes.lastUpdated,
+      estimatedReadingTime: attributes.estimatedReadingTime
+    };
+
+    console.log('Created post object:', { ...post, content: '...' });
+    return [post];
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error('Error loading blog posts:', error);
     return [];
   }
-}
-
-export async function getPostBySlug(slug: string): Promise<Post | null> {
-  try {
-    const response = await fetch(`/content/blog/${slug}.md`);
-    if (!response.ok) {
-      throw new Error(`Post not found: ${slug}`);
-    }
-    const markdown = await response.text();
-    const { data, content } = matter(markdown);
-    
-    if (!data.title || !data.author || !data.date) {
-      throw new Error('Invalid post data: missing required fields');
-    }
-    
-    return {
-      slug,
-      title: data.title,
-      author: data.author,
-      date: data.date,
-      thumbnail: data.thumbnail,
-      description: data.description,
-      content,
-      category: data.category,
-      tags: data.tags || [],
-      published: data.published
-    };
-  } catch (error) {
-    console.error(`Error fetching post ${slug}:`, error);
-    return null;
-  }
-}
-
-export async function getAuthorBySlug(slug: string): Promise<Author | null> {
-  try {
-    const response = await fetch(`/content/authors/${slug}.md`);
-    if (!response.ok) {
-      throw new Error(`Author not found: ${slug}`);
-    }
-    const markdown = await response.text();
-    const { data } = matter(markdown);
-    
-    if (!data.name || !data.role || !data.bio) {
-      throw new Error('Invalid author data: missing required fields');
-    }
-    
-    return {
-      slug,
-      name: data.name,
-      avatar: data.avatar,
-      role: data.role,
-      bio: data.bio,
-      expertise: data.expertise || [],
-      education: data.education || [],
-      certifications: data.certifications || [],
-      professional_experience: data.professional_experience || [],
-      publications: data.publications || [],
-      speaking_engagements: data.speaking_engagements || [],
-      memberships: data.memberships || [],
-      social: data.social || {}
-    };
-  } catch (error) {
-    console.error(`Error fetching author ${slug}:`, error);
-    return null;
-  }
-}
-
-export async function getPostsByAuthor(authorSlug: string): Promise<Post[]> {
-  try {
-    const posts = await getAllPosts();
-    return posts.filter(post => post.author === authorSlug);
-  } catch (error) {
-    console.error(`Error fetching posts for author ${authorSlug}:`, error);
-    return [];
-  }
-}
-
-export async function markdownToHtml(markdown: string): Promise<string> {
-  try {
-    const result = await remark()
-      .use(html)
-      .use(remarkGfm)
-      .process(markdown);
-    return result.toString();
-  } catch (error) {
-    console.error('Error converting markdown:', error);
-    return '';
-  }
-}
+};

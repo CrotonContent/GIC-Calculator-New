@@ -1,42 +1,27 @@
 ---
-name: Daniel Schoester, CFA, FRM
-avatar: https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80
-role: Senior Investment Strategist & Fixed Income Specialist
-bio: Daniel Schoester brings over 15 years of expertise in Canadian fixed-income markets and GIC analysis. As a former Senior Fixed Income Analyst at RBC Capital Markets and current Investment Strategist at BMO Wealth Management, he specializes in helping both institutional and retail clients optimize their fixed-income portfolios. His research on GIC strategies has been published in the Canadian Investment Review and he regularly contributes to the Financial Post on topics related to fixed-income investments.
+name: Daniel Schoester
+avatar: https://media.licdn.com/dms/image/v2/D4D03AQEQ_WXWACHc6w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1681162747665?e=2147483647&v=beta&t=2ggKXm1bsL5VPEAZUWO01INJWVNzN3RIOa4J5hFC62k
+role: Financial Content Expert
+bio: Daniel Schoester is a dedicated financial content expert with a strong foundation in finance. He holds an Honours BBA in Finance from Wilfrid Laurier University and has contributed well-researched financial articles to respected publications including Forbes Advisor and Hardbacon. Through his work at Croton Content, Daniel focuses on explaining complex financial topics clearly and accurately, helping readers better understand various financial products and concepts. His articles on GICs and fixed-income investments have helped countless readers make more informed financial decisions.
 expertise:
-  - Fixed Income Securities Analysis
-  - GIC Portfolio Strategy
-  - Interest Rate Risk Management
-  - Investment Policy Development
+  - Financial Research
+  - Fixed Income Products
+  - Financial Content Creation
+  - Educational Finance Writing
 education:
-  - degree: Master of Finance
-    institution: McGill University
-    year: 2012
-  - degree: Bachelor of Commerce in Finance
-    institution: University of Toronto
-    year: 2010
-certifications:
-  - name: Chartered Financial Analyst (CFA)
-    organization: CFA Institute
-    year: 2015
-  - name: Financial Risk Manager (FRM)
-    organization: GARP
-    year: 2016
+  - degree: Honours BBA (Finance)
+    institution: Wilfrid Laurier University
 professional_experience:
-  - role: Senior Investment Strategist
-    company: BMO Wealth Management
-    period: 2020-Present
-  - role: Fixed Income Analyst
-    company: RBC Capital Markets
-    period: 2015-2020
+  - role: Financial Content Expert
+    company: Croton Content
+    period: Present
+  - role: Financial Content Writer
+    company: WOWA
+    period: Past
 publications:
-  - title: "The Evolution of GIC Strategies in a Low-Rate Environment"
-    publisher: Canadian Investment Review
-    year: 2023
-  - title: "Optimizing Fixed Income Portfolios for Retail Investors"
-    publisher: Financial Post
-    year: 2022
+  - title: Financial Education Articles
+    publisher: Forbes Advisor, Hardbacon, Loans Canada
 social:
-  linkedin: https://linkedin.com/in/danielschoester
-  twitter: https://twitter.com/danielschoester
+  linkedin: https://www.linkedin.com/in/dschoester/
+  twitter: https://x.com/danielschoester
 ---

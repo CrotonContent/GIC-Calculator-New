@@ -1,40 +1,40 @@
 export interface Author {
   slug: string;
   name: string;
-  avatar: string;
   role: string;
+  avatar: string;
   bio: string;
-  expertise: string[];
-  education: {
-    degree: string;
-    institution: string;
-    year: number;
-  }[];
-  certifications: {
-    name: string;
-    organization: string;
-    year: number;
-  }[];
+  expertise?: string[];
   professional_experience?: {
     role: string;
     company: string;
     period: string;
   }[];
+  education?: {
+    degree: string;
+    institution: string;
+    year: string;
+  }[];
+  certifications?: {
+    name: string;
+    organization: string;
+    year: string;
+  }[];
   publications?: {
     title: string;
     publisher: string;
-    year: number;
+    year: string;
   }[];
   speaking_engagements?: {
     title: string;
     venue: string;
-    year: number;
+    year: string;
   }[];
   memberships?: {
     name: string;
     status: string;
   }[];
-  social: {
+  social?: {
     linkedin?: string;
     twitter?: string;
   };
@@ -43,12 +43,15 @@ export interface Author {
 export interface Post {
   slug: string;
   title: string;
-  author: string;
-  date: string;
-  thumbnail?: string;
+  excerpt: string;
   description: string;
   content: string;
+  author: Author;
+  date: string;
   category: string;
   tags: string[];
   published: boolean;
+  lastUpdated?: string;
+  estimatedReadingTime?: number;
+  featuredImage?: string;
 }
