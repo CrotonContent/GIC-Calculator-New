@@ -1,8 +1,15 @@
 import React from 'react';
+import SEO from '../components/common/SEO';
 
 const About: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <>
+      <SEO
+        title="About GICCalculator.ca"
+        description="Learn about GICCalculator.ca — Canada's trusted free tool for calculating GIC returns and comparing rates from top Canadian financial institutions."
+        url="/about"
+      />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">About GICCalculator.ca</h1>
       
       <div className="prose prose-lg">
@@ -27,6 +34,7 @@ const About: React.FC = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 
