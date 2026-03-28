@@ -1,8 +1,15 @@
 import React from 'react';
+import SEO from '../components/common/SEO';
 
 const Privacy: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <>
+      <SEO
+        title="Privacy Policy | GICCalculator.ca"
+        description="Read the GICCalculator.ca privacy policy. Learn how we collect, use, and protect your data when you use our free Canadian GIC calculator."
+        url="/privacy"
+      />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Privacy Policy</h1>
       
       <div className="prose prose-lg">
@@ -32,6 +39,7 @@ const Privacy: React.FC = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 

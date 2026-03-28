@@ -7,6 +7,8 @@ interface SEOProps {
   type?: 'website' | 'article';
   post?: Post;
   url: string;
+  /** Pass true only on the homepage to inject WebApplication + FAQPage schema */
+  isHomePage?: boolean;
 }
 
 interface MetaTags {
@@ -26,18 +28,25 @@ interface MetaTags {
   'article:author'?: string;
 }
 
-const SEO: React.FC<SEOProps> = ({ title, description, type = 'website', post, url }) => {
+const SEO: React.FC<SEOProps> = ({
+  title,
+  description,
+  type = 'website',
+  post,
+  url,
+  isHomePage = false,
+}) => {
   const baseUrl = 'https://giccalculator.ca';
   const fullUrl = `${baseUrl}${url}`;
   const siteName = 'GICCalculator.ca';
 
   useEffect(() => {
-    // Update title - don't append site name for home page
+    // Update title — don't append site name for home page
     document.title = url === '/' ? title : `${title} | ${siteName}`;
 
-    // Update meta tags
+    // Build meta tags object
     const metaTags: MetaTags = {
-      'description': description,
+      description,
       'og:site_name': siteName,
       'og:title': title,
       'og:description': description,
@@ -48,7 +57,7 @@ const SEO: React.FC<SEOProps> = ({ title, description, type = 'website', post, u
       'twitter:description': description,
     };
 
-    // Add article specific meta tags
+    // Article-specific Open Graph meta tags
     if (type === 'article' && post) {
       metaTags['article:published_time'] = post.date;
       metaTags['article:modified_time'] = post.lastUpdated || post.date;
@@ -62,9 +71,10 @@ const SEO: React.FC<SEOProps> = ({ title, description, type = 'website', post, u
 
     // Update existing or create new meta tags
     Object.entries(metaTags).forEach(([name, content]) => {
-      let meta = document.querySelector(`meta[property="${name}"]`) ||
-                 document.querySelector(`meta[name="${name}"]`);
-      
+      let meta =
+        document.querySelector(`meta[property="${name}"]`) ||
+        document.querySelector(`meta[name="${name}"]`);
+
       if (!meta) {
         meta = document.createElement('meta');
         if (name.startsWith('og:') || name.startsWith('article:')) {
@@ -74,7 +84,7 @@ const SEO: React.FC<SEOProps> = ({ title, description, type = 'website', post, u
         }
         document.head.appendChild(meta);
       }
-      
+
       meta.setAttribute('content', content);
     });
 
@@ -87,125 +97,193 @@ const SEO: React.FC<SEOProps> = ({ title, description, type = 'website', post, u
     }
     canonical.setAttribute('href', fullUrl);
 
-    // Add structured data
-    const getStructuredData = () => {
-      const organization = {
-        '@type': 'Organization',
-        '@id': `${baseUrl}/#organization`,
-        name: siteName,
-        url: baseUrl,
-        logo: {
-          '@type': 'ImageObject',
-          url: `${baseUrl}/favicon.svg`,
-        }
-      };
+    // ----------------------------------------------------------------
+    // Structured data
+    // ----------------------------------------------------------------
+    const organization = {
+      '@type': 'Organization',
+      '@id': `${baseUrl}/#organization`,
+      name: siteName,
+      url: baseUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${baseUrl}/favicon.svg`,
+      },
+    };
 
-      if (!post) {
+    const website = {
+      '@type': 'WebSite',
+      '@id': `${baseUrl}/#website`,
+      url: baseUrl,
+      name: siteName,
+      publisher: { '@id': `${baseUrl}/#organization` },
+    };
+
+    const getStructuredData = (): object | object[] => {
+      // ── Blog post: Article + BreadcrumbList ──────────────────────────
+      if (post) {
+        const authorSchema = {
+          '@type': 'Person',
+          '@id': `${baseUrl}/blog/author/${post.author.slug}`,
+          name: post.author.name,
+          description: post.author.bio,
+          image: post.author.avatar,
+          jobTitle: post.author.role,
+          url: `${baseUrl}/blog/author/${post.author.slug}`,
+          sameAs: [post.author.social?.linkedin].filter(Boolean),
+          worksFor: { '@id': `${baseUrl}/#organization` },
+          knowsAbout: post.author.expertise,
+        };
+
         return {
           '@context': 'https://schema.org',
           '@graph': [
             organization,
+            website,
             {
-              '@type': 'WebSite',
-              '@id': `${baseUrl}/#website`,
-              url: baseUrl,
-              name: siteName,
+              '@type': 'Article',
+              '@id': fullUrl,
+              isPartOf: { '@id': `${baseUrl}/#website` },
+              headline: post.title,
+              description: post.description,
+              author: authorSchema,
               publisher: { '@id': `${baseUrl}/#organization` },
-            }
-          ]
+              datePublished: post.date,
+              dateModified: post.lastUpdated || post.date,
+              mainEntityOfPage: fullUrl,
+              keywords: post.tags.join(', '),
+            },
+            {
+              '@type': 'BreadcrumbList',
+              '@id': `${fullUrl}#breadcrumb`,
+              itemListElement: [
+                {
+                  '@type': 'ListItem',
+                  position: 1,
+                  item: { '@id': baseUrl, name: 'Home' },
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 2,
+                  item: { '@id': `${baseUrl}/blog`, name: 'Blog' },
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 3,
+                  item: { '@id': fullUrl, name: post.title },
+                },
+              ],
+            },
+          ],
         };
       }
 
-      const authorSchema = {
-        '@type': 'Person',
-        '@id': `${baseUrl}/blog/author/${post.author.slug}`,
-        name: post.author.name,
-        description: post.author.bio,
-        image: post.author.avatar,
-        jobTitle: post.author.role,
-        url: `${baseUrl}/blog/author/${post.author.slug}`,
-        sameAs: [
-          post.author.social?.linkedin,
-        ].filter(Boolean),
-        worksFor: { '@id': `${baseUrl}/#organization` },
-        knowsAbout: post.author.expertise,
-      };
-
-      return {
-        '@context': 'https://schema.org',
-        '@graph': [
-          organization,
+      // ── Homepage: WebApplication + FAQPage ──────────────────────────
+      if (isHomePage) {
+        return [
           {
-            '@type': 'Article',
-            '@id': fullUrl,
-            isPartOf: { '@id': `${baseUrl}/#website` },
-            headline: post.title,
-            description: post.description,
-            author: authorSchema,
-            publisher: { '@id': `${baseUrl}/#organization` },
-            datePublished: post.date,
-            dateModified: post.lastUpdated || post.date,
-            mainEntityOfPage: fullUrl,
-            keywords: post.tags.join(', '),
+            '@context': 'https://schema.org',
+            '@graph': [organization, website],
           },
           {
-            '@type': 'BreadcrumbList',
-            '@id': `${fullUrl}#breadcrumb`,
-            itemListElement: [
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'GIC Calculator',
+            description:
+              'Calculate Guaranteed Investment Certificate (GIC) returns and compare rates with our free Canadian GIC calculator.',
+            url: baseUrl,
+            applicationCategory: 'FinanceApplication',
+            operatingSystem: 'All',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+            },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
               {
-                '@type': 'ListItem',
-                position: 1,
-                item: {
-                  '@id': baseUrl,
-                  name: 'Home'
-                }
+                '@type': 'Question',
+                name: 'What is a GIC?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'A Guaranteed Investment Certificate (GIC) is a secure investment that guarantees 100% of your initial investment plus a fixed rate of interest over a specific term.',
+                },
               },
               {
-                '@type': 'ListItem',
-                position: 2,
-                item: {
-                  '@id': `${baseUrl}/blog`,
-                  name: 'Blog'
-                }
+                '@type': 'Question',
+                name: 'How is the interest calculated?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'GIC interest is typically calculated using compound interest, where interest is earned not only on your initial investment but also on the accumulated interest from previous periods.',
+                },
               },
               {
-                '@type': 'ListItem',
-                position: 3,
-                item: {
-                  '@id': fullUrl,
-                  name: post.title
-                }
-              }
-            ]
-          }
-        ]
+                '@type': 'Question',
+                name: 'What are the common GIC terms?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'GIC terms typically range from 30 days to 10 years, with the most common terms being 1–5 years. Generally, longer terms offer higher interest rates.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'Are GICs a safe investment?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Yes, GICs are considered very safe investments as they are guaranteed by the issuing financial institution and are eligible for CDIC insurance up to $100,000.',
+                },
+              },
+              {
+                '@type': 'Question',
+                name: 'What is the minimum investment for a GIC?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Minimum investments vary by institution but typically start at $500 or $1,000.',
+                },
+              },
+            ],
+          },
+        ];
+      }
+
+      // ── All other pages: Organization + WebSite only ─────────────────
+      return {
+        '@context': 'https://schema.org',
+        '@graph': [organization, website],
       };
     };
 
-    // Update structured data
-    let ldJson = document.querySelector('script[type="application/ld+json"]');
-    if (!ldJson) {
-      ldJson = document.createElement('script');
-      ldJson.setAttribute('type', 'application/ld+json');
-      document.head.appendChild(ldJson);
-    }
-    ldJson.textContent = JSON.stringify(getStructuredData());
+    // Remove all existing ld+json script tags injected by this component
+    document.querySelectorAll('script[type="application/ld+json"][data-seo-component]').forEach(
+      (el) => el.remove()
+    );
 
-    // Cleanup function
+    // Inject fresh structured data
+    const schemas = getStructuredData();
+    const schemasArray = Array.isArray(schemas) ? schemas : [schemas];
+    schemasArray.forEach((schema) => {
+      const script = document.createElement('script');
+      script.setAttribute('type', 'application/ld+json');
+      script.setAttribute('data-seo-component', 'true');
+      script.textContent = JSON.stringify(schema);
+      document.head.appendChild(script);
+    });
+
+    // Cleanup on unmount
     return () => {
-      // Remove meta tags and structured data when component unmounts
-      Object.keys(metaTags).forEach(name => {
-        const meta = document.querySelector(`meta[property="${name}"]`) ||
-                    document.querySelector(`meta[name="${name}"]`);
-        if (meta) {
-          meta.remove();
-        }
+      Object.keys(metaTags).forEach((name) => {
+        const meta =
+          document.querySelector(`meta[property="${name}"]`) ||
+          document.querySelector(`meta[name="${name}"]`);
+        if (meta) meta.remove();
       });
-      if (ldJson) {
-        ldJson.remove();
-      }
+      document.querySelectorAll('script[type="application/ld+json"][data-seo-component]').forEach(
+        (el) => el.remove()
+      );
     };
-  }, [title, description, type, post, url]);
+  }, [title, description, type, post, url, isHomePage]);
 
   return null;
 };

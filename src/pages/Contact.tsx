@@ -1,9 +1,16 @@
 import React from 'react';
 import { Mail } from 'lucide-react';
+import SEO from '../components/common/SEO';
 
 const Contact: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <>
+      <SEO
+        title="Contact GICCalculator.ca"
+        description="Get in touch with the GICCalculator.ca team. We welcome your questions, feedback, and suggestions about our free Canadian GIC calculator."
+        url="/contact"
+      />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Contact Us</h1>
       
       <div className="bg-white shadow-lg rounded-lg p-6 md:p-8">
@@ -19,6 +26,7 @@ const Contact: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
